@@ -1,0 +1,167 @@
+swagger: "2.0"
+info:
+  title: Pioneer Labs API's
+  version: "1.0"
+paths:
+  /api/auth/login:
+    post:
+      summary: Endpoint for user login
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            type: object
+            properties:
+              email:
+                type: string
+                format: email
+              password:
+                type: string
+      responses:
+        200:
+          description: Login successful
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              jwtToken:
+                type: string
+        400:
+          description: Invalid email format
+        401:
+          description: Email is not registered or Incorrect password
+        500:
+          description: Server error
+
+  /api/auth/register:
+    post:
+      summary: Endpoint for user registration
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            type: object
+            properties:
+              username:
+                type: string
+              email:
+                type: string
+                format: email
+              password:
+                type: string
+      responses:
+        201:
+          description: Registration successful
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              jwtToken:
+                type: string
+        400:
+          description: Invalid email format or Email already registered
+        401:
+          description: Username already used
+        500:
+          description: Server error
+
+  /api/getdata:
+    get:
+      summary: Endpoint to fetch data from a public API
+      parameters:
+        - name: limit
+          in: query
+          description: Number of results to limit
+          required: false
+          type: integer
+          format: int32
+        - name: category
+          in: query
+          description: Category of data to fetch
+          required: true
+          type: string
+        - name: Authorization
+          in: header
+          description: JWT token for authentication
+          required: true
+          type: string
+      responses:
+        200:
+          description: Data fetched successfully
+          schema:
+            type: object
+            properties:
+              entries:
+                type: array
+                items:
+                  $ref: "#/definitions/Data"
+              results:
+                type: integer
+                format: int32
+        400:
+          description: Bad request, missing required parameter or invalid parameter format
+        401:
+          description: Unauthorized - JWT token missing or invalid
+        500:
+          description: Server error
+
+  /ethbalance/{address}:
+    get:
+      summary: Endpoint to fetch Ethereum balance
+      parameters:
+        - name: address
+          in: path
+          description: Ethereum address to fetch balance for
+          required: true
+          type: string
+      responses:
+        200:
+          description: Ethereum balance fetched successfully
+          schema:
+            type: object
+            properties:
+              balance:
+                type: string
+        500:
+          description: Server error
+
+definitions:
+  User:
+    type: object
+    properties:
+      username:
+        type: string
+      email:
+        type: string
+        format: email
+      password:
+        type: string
+  Data:
+    type: object
+    properties:
+      API:
+        type: string
+      Description:
+        type: string
+      Auth:
+        type: string
+      HTTPS:
+        type: boolean
+      Cors:
+        type: string
+      Link:
+        type: string
+      Category:
+        type: string
